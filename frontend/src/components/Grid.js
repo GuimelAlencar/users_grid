@@ -32,7 +32,35 @@ export const Th = styled.th`
     }
 `;
 
-const Grid = () => {
+export const Td = styled.td`
+  padding-top: 15px;
+  text-align: ${(props) => (props.alignCenter ? "center" : "start")};
+  width: ${(props) => (props.width ? props.width : "auto")};
+
+  @media (max-width: 500px) {
+    ${(props) => props.onlyWeb && "display: none"}
+  }
+`;
+
+const Grid = ({users, setUsers, setOnEdit}) => {
+
+    const handleEdit = (item) => {
+        setOnEdit(item);
+    }
+
+    const handleDelete = async (id) => {
+        await axios
+            .delete("http://localhost:3000/" + id)
+            .then(({ data }) => {
+                const newArray = users.filter((user) => user.id !== id);
+
+                setUsers(newArray);
+                toast.success(data);
+            })
+            .catch(({data}) => toast.error(data));
+
+        setOnEdit(null);
+    }
 
     return(
         <Table>
@@ -54,10 +82,10 @@ const Grid = () => {
                             {item.phone}
                         </Td>
                         <Td alignCenter width="5%">
-                            <FaEdit />
+                            <FaEdit onClick={() => handleEdit(item)}/>
                         </Td>
                         <Td alignCenter width="5%">
-                            <FaTrash />
+                            <FaTrash onClick={() => handleDelete(item.id)}/>
                         </Td>
                     </Tr>
                 ))}
